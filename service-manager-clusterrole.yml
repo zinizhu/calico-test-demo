@@ -4,5 +4,8 @@ metadata:
   name: service-manager-role
 rules:
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["pods", "pods/log", "pods/exec", "pods/ephemeralcontainers", "services", "namespaces"]
+  resources: ["pods", "pods/log", "pods/exec", "pods/ephemeralcontainers"]
   verbs: ["get", "watch", "list", "create", "delete", "update"]
+- apiGroups: [""]
+  resources: ["services","namespaces"]
+  verbs: ["get", "watch", "list"]
