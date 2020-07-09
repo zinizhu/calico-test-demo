@@ -1,0 +1,167 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+    name: demo-1
+    labels:
+        role: demo-1
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+    name: demo-2
+    labels:
+        role: demo-2
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+    name: demo-3
+    labels:
+        role: demo-3
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    name: demo-1-deployment
+    namespace: demo-1
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            color: blue
+    template:
+        metadata:
+            name: demo-1
+            labels:
+                color: blue
+        spec:
+            containers:
+            - name: nginx-1
+              image: nginx
+              ports:
+              - containerPort: 80
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    name: demo-2-deployment
+    namespace: demo-2
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            color: red
+    template:
+        metadata:
+            name: demo-2
+            labels:
+                color: red
+        spec:
+            containers:
+            - name: nginx-2
+              image: nginx
+              ports:
+              - containerPort: 80
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata: 
+    name: demo-3-deployment
+    namespace: demo-3
+spec:
+    replicas: 1
+    selector: 
+        matchLabels:
+            color: yellow
+    template:
+        metadata:
+            name: demo-3
+            labels:
+                color: yellow
+        spec:
+            containers:
+            - name: nginx-3
+              image: nginx
+              ports:
+              - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+    name: nginx-1-service
+    namespace: demo-1
+    labels:
+        color: blue
+spec:
+    ports:
+    - port: 80
+      protocol: TCP
+    selector:
+        color: blue
+    externalName: nginx-1-service.demo-1.svc.cluster.local
+---
+kind: Service
+apiVersion: v1
+metadata:
+    name: nginx-2-service
+    namespace: demo-2
+    labels: 
+        color: red
+spec:
+    ports:
+    - port: 80
+      protocol: TCP
+    selector:
+        color: red
+    externalName: nginx-2-service.demo-2.svc.cluster.local
+---
+kind: Service
+apiVersion: v1
+metadata:
+    name: nginx-3-service
+    namespace: demo-3
+    labels:
+        color: yellow
+spec:
+    ports:
+    - port: 80
+      protocol: TCP
+    selector:
+        color: yellow
+    externalName: nginx-3-service.demo-3.svc.cluster.local
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+    name: demo-1-policy
+    namespace: demo-1
+spec:
+    podSelector:
+        matchLabels:
+            color: blue
+    ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+                color: red
+          namespaceSelector: 
+            matchLabels:
+                role: demo-2
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+    name: demo-2-policy
+    namespace: demo-2
+spec:
+    podSelector:
+        matchLabels:
+            color: red
+    ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+                color: yellow
+          namespaceSelector:
+            matchLabels:
+                role: demo-3
